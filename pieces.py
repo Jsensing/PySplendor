@@ -24,17 +24,18 @@ class Card:
         return f"Level: {self.level} Color: {self.color} VP: {self.vp}, Black: {self.onyx}, Blue: {self.sapphire}, Green: {self.emerald}, Red: {self.ruby}, White: {self.diamond}"
 
 class Noble:
-    def __init__(self, ID, diamond, sapphire, emerald, ruby, onyx, pointValue):
+    def __init__(self, ID, diamond, sapphire, emerald, ruby, onyx, wild, pointValue):
         self.ID = ID
         self.diamond = diamond
         self.sapphire = sapphire
         self.emerald = emerald
         self.ruby = ruby
         self.onyx = onyx
+        self.wild = wild
         self.pointValue = pointValue
 
     def __str__(self):
-        return f"ID: {self.ID}, Diamond: {self.diamond}, Sapphire: {self.sapphire}, Emerald: {self.emerald}, Ruby: {self.ruby}, Onyx: {self.onyx}, Point Value: {self.pointValue}"
+        return f"ID: {self.ID}, Diamond: {self.diamond}, Sapphire: {self.sapphire}, Emerald: {self.emerald}, Ruby: {self.ruby}, Onyx: {self.onyx}, Wild: {self.wild}, Point Value: {self.pointValue}"
 
 class Nobles:
     def __init__(self, filename):
