@@ -13,7 +13,7 @@ class Player:
             for i, gem in enumerate(gem_options, 1):
                 print(f"{i}) {gem.capitalize()}")
             choice = int(input("Enter your choice (1-5): "))
-            gem_type = gem_options[choice - 1]  # Get the selected gem type
+            gem_type = gem_options.pop(choice - 1)  # Remove the selected gem type from gem_options
             selections.append(gem_type)
         return selections
 
