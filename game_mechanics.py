@@ -3,7 +3,7 @@ import players
 import random
 
 
-def process_file(input_file):
+def process_decks(input_file):
     level1_deck = []
     level2_deck = []
     level3_deck = []
@@ -30,20 +30,8 @@ def process_file(input_file):
 
     return level1_deck, level2_deck, level3_deck
 
-def reveal_cards(cards_list):
-    random.shuffle(cards_list)
-    revealed_cards = []
-    for level in range(1, 4):
-        level_cards = [card for card in cards_list if card.level == level]
-        revealed_cards.extend(random.sample(level_cards, 4))
-    return revealed_cards
-
-def reveal_nobles(nobles_list):
-    random.shuffle(nobles_list)
-    return random.sample(nobles_list, 3)
-
-def create_token_deck(gem_type, num_tokens):
-    return [gem_type] * num_tokens
+def create_token_deck(gemType, num_tokens):
+    return [gemType] * num_tokens
 
 def create_gem_decks():
     ruby_deck = create_token_deck("Ruby", 4)
@@ -54,20 +42,88 @@ def create_gem_decks():
     wild_deck = create_token_deck("Wild", 5)  # Wilds have 5 tokens
     return ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck
 
-def game_setup(cards_list, nobles_list):
-    revealed_cards = reveal_cards(cards_list)
-    revealed_nobles = reveal_nobles(nobles_list)
-    remaining_nobles = [noble for noble in nobles_list if noble not in revealed_nobles]
-    ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck = create_gem_decks()
-    return revealed_cards, revealed_nobles, remaining_nobles, ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck
+def add_gems(self, *gems):
+    if len(gems) != 3:
+        print("Error: You must select exactly 3 gems of different colors.")
+        return
+
+    colors = set()
+    for gem in gems:
+        if gem.color in colors:
+            print("Error: Gems must be of different colors.")
+            return
+        colors.add(gem.color)
+
+    self.gems_in_hand.extend(gems)
+    print("Gems added successfully.")
+
+
+def select3Gems(player):
+    gems = ["diamond", "ruby", "emerald", "sapphire", "onyx"]
+    selections = []
+
+    for g in range(3):
+        print("Select a gem:")
+        for i, gem in enumerate(gems, start=1):
+            print(f"{i}) {gem.capitalize()}")
+
+        choice = int(input("Enter your choice (1-5): "))
+        if choice < 1 or choice > 5:
+            print("Invalid choice. Please select again.")
+            continue
+
+        selected_gem = gems.pop(choice - 1)
+        selections.append(selected_gem)
+
+    player.add_gems_to_hand(selections)
+    print("Gems added to your inventory:", selections)
 
 if __name__ == "__main__":
+    field = []
+
+    # create players
     player1 = players.Player()
     player2 = players.Player()
 
-    level1Deck, level2Deck, level3Deck = process_file(r'C:\Users\wrait\OneDrive\Desktop\PySplendor\cards.txt')
+    # create card decks
+    level1Deck, level2Deck, level3Deck = process_decks(r'C:\Users\wrait\OneDrive\Desktop\PySplendor\cards.txt')
+    # create 3 random nobles
     noble = pieces.Nobles(r'C:\Users\wrait\OneDrive\Desktop\PySplendor\nobles.txt')
     noble1, noble2, noble3 = noble.get_random_nobles()
-    print(noble1)
-    print(len(level1Deck))
+    nobles = [noble1, noble2, noble3]
 
+    # create gem decks
+    ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck = create_gem_decks()
+# display nobles
+    for a in nobles:
+        print(a)
+# break for readability
+    print('\n')
+
+    # Randomly select and display 4 objects from level1Deck
+    selectedLevel1Cards = random.sample(level1Deck, 4)
+    for card in selectedLevel1Cards:
+        # Remove the selected card from level1Deck
+        level1Deck.remove(card)
+        # Add the selected card to the Field list
+        field.append(card)
+
+    # Randomly select and display 4 objects from level2Deck
+    selectedLevel2Cards = random.sample(level2Deck, 4)
+    for card in selectedLevel2Cards:
+        # Remove the selected card from level2Deck
+        level2Deck.remove(card)
+        # Add the selected card to the Field list
+        field.append(card)
+
+    # Randomly select and display 4 objects from level3Deck
+    selectedLevel3Cards = random.sample(level3Deck, 4)
+    for card in selectedLevel3Cards:
+        # Remove the selected card from level2Deck
+        level3Deck.remove(card)
+        # Add the selected card to the Field list
+        field.append(card)
+
+    for a in field:
+        print(a)
+    select3Gems(player1)

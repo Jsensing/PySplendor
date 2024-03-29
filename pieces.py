@@ -1,14 +1,5 @@
 import random
 
-class Gem:
-    def __init__(self, name, points):
-        self.name = name
-        self.points = points
-
-    def __str__(self):
-        return f"{self.points} {self.name}"
-
-
 class Card:
     def __init__(self, level, color, vp, onyx, sapphire, emerald, ruby, diamond):
         self.level = level

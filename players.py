@@ -12,7 +12,7 @@ class Player:
         self.vp = vp  # Victory points
         self.gems_in_play = gems_in_play  # Dictionary to store gems in play and their quantities
 
-    def add_gems_to_hand(self, gem_type, quantity):
+    def add_gems_to_hand(self, gem_type, quantity=1):
         if gem_type in self.gems_in_hand:
             self.gems_in_hand[gem_type] += quantity
         else:
