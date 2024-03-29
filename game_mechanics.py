@@ -42,42 +42,6 @@ def create_gem_decks():
     wild_deck = create_token_deck("Wild", 5)  # Wilds have 5 tokens
     return ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck
 
-def add_gems(self, *gems):
-    if len(gems) != 3:
-        print("Error: You must select exactly 3 gems of different colors.")
-        return
-
-    colors = set()
-    for gem in gems:
-        if gem.color in colors:
-            print("Error: Gems must be of different colors.")
-            return
-        colors.add(gem.color)
-
-    self.gems_in_hand.extend(gems)
-    print("Gems added successfully.")
-
-
-def select3Gems(player):
-    gems = ["diamond", "ruby", "emerald", "sapphire", "onyx"]
-    selections = []
-
-    for g in range(3):
-        print("Select a gem:")
-        for i, gem in enumerate(gems, start=1):
-            print(f"{i}) {gem.capitalize()}")
-
-        choice = int(input("Enter your choice (1-5): "))
-        if choice < 1 or choice > 5:
-            print("Invalid choice. Please select again.")
-            continue
-
-        selected_gem = gems.pop(choice - 1)
-        selections.append(selected_gem)
-
-    player.add_gems_to_hand(selections)
-    print("Gems added to your inventory:", selections)
-
 if __name__ == "__main__":
     field = []
 
@@ -94,10 +58,10 @@ if __name__ == "__main__":
 
     # create gem decks
     ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck = create_gem_decks()
-# display nobles
+    # display nobles
     for a in nobles:
         print(a)
-# break for readability
+    # break for readability
     print('\n')
 
     # Randomly select and display 4 objects from level1Deck
@@ -126,4 +90,7 @@ if __name__ == "__main__":
 
     for a in field:
         print(a)
-    select3Gems(player1)
+
+    player1.add_gems_to_hand_single(player1.add_3gems_to_hand())
+    player1.add_gems_to_hand_single(player1.add_3gems_to_hand())
+    print(player1.gems_in_hand)

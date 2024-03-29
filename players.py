@@ -12,11 +12,24 @@ class Player:
         self.vp = vp  # Victory points
         self.gems_in_play = gems_in_play  # Dictionary to store gems in play and their quantities
 
-    def add_gems_to_hand(self, gem_type, quantity=1):
+    def add_3gems_to_hand(self):
+        gem_options = ["diamond", "ruby", "emerald", "sapphire", "onyx"]
+        selections = []
+        for _ in range(3):
+            print("Select a gem type:")
+            for i, gem in enumerate(gem_options, 1):
+                print(f"{i}) {gem.capitalize()}")
+            choice = int(input("Enter your choice (1-5): "))
+            gem_type = gem_options.pop(choice - 1)  # Remove the selected gem type
+            selections.append(gem_type)
+        for gem_type in selections:
+            self.add_gems_to_hand_single(gem_type)
+
+    def add_gems_to_hand_single(self, gem_type):
         if gem_type in self.gems_in_hand:
-            self.gems_in_hand[gem_type] += quantity
+            self.gems_in_hand[gem_type] += 1  # Increase the quantity by 1
         else:
-            self.gems_in_hand[gem_type] = quantity
+            self.gems_in_hand[gem_type] = 1  # Add the gem with a quantity of 1
 
     def reserve_card(self, card):
         self.reserved_cards.append(card)
