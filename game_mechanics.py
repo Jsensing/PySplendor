@@ -40,7 +40,7 @@ def create_gem_decks():
     onyx_deck = create_token_deck("Onyx", 4)
     emerald_deck = create_token_deck("Emerald", 4)
     wild_deck = create_token_deck("Wild", 5)  # Wilds have 5 tokens
-    return ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck
+    return [ruby_deck, sapphire_deck, diamond_deck, onyx_deck, emerald_deck, wild_deck]
 
 if __name__ == "__main__":
     field = []
