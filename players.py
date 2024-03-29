@@ -1,25 +1,23 @@
 class Player:
-    def __init__(self, gems_in_hand=None, reserved_cards=None, vp=0, gems_in_play=None):
-        if gems_in_hand is None:
-            gems_in_hand = {}
-        if reserved_cards is None:
-            reserved_cards = []
-        if gems_in_play is None:
-            gems_in_play = {}
-
-        self.gems_in_hand = gems_in_hand  # Dictionary to store gems and their quantities
-        self.reserved_cards = reserved_cards  # List to store reserved cards
-        self.vp = vp  # Victory points
-        self.gems_in_play = gems_in_play  # Dictionary to store gems in play and their quantities
+    def __init__(self):
+        self.gems_in_hand = {}  # Dictionary to store gems and their quantities
+        self.reserved_cards = []  # List to store reserved cards
+        self.vp = 0  # Victory points
+        self.gems_in_play = {}  # Dictionary to store gems in play and their quantities
 
     def add_3gems_to_hand(self):
-        gem_options = ["diamond", "ruby", "emerald", "sapphire", "onyx"]
+        gem_options = ["Diamond", "Ruby", "Emerald", "Sapphire", "Onyx"]
         selections = []
         for _ in range(3):
             print("Select a gem type:")
             for i, gem in enumerate(gem_options, 1):
                 print(f"{i}) {gem.capitalize()}")
-            choice = int(input("Enter your choice (1-5): "))
+            while True:
+                choice = int(input("Enter your choice (1-5): "))
+                if choice in range(1, 6):
+                    break
+                else:
+                    print("Invalid choice. Please enter a number between 1 and 5.")
             gem_type = gem_options.pop(choice - 1)  # Remove the selected gem type
             selections.append(gem_type)
         for gem_type in selections:

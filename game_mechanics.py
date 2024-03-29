@@ -92,5 +92,6 @@ if __name__ == "__main__":
         print(a)
 
     player1.add_gems_to_hand_single(player1.add_3gems_to_hand())
-    player1.add_gems_to_hand_single(player1.add_3gems_to_hand())
+    if None in player1.gems_in_hand.values():
+        player1.gems_in_hand = {k: v for k, v in player1.gems_in_hand.items() if v is not None}
     print(player1.gems_in_hand)
