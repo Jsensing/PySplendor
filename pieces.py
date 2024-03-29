@@ -25,7 +25,7 @@ class Noble:
         self.pointValue = pointValue
 
     def __str__(self):
-        return f"ID: {self.ID}, Diamond: {self.diamond}, Sapphire: {self.sapphire}, Emerald: {self.emerald}, Ruby: {self.ruby}, Onyx: {self.onyx}, Wild: {self.wild}, Point Value: {self.pointValue}"
+        return f"ID: {self.ID}, Diamond: {self.diamond}, Sapphire: {self.sapphire}, Emerald: {self.emerald}, Ruby: {self.ruby}, Onyx: {self.onyx}, Point Value: {self.pointValue}"
 
 class Nobles:
     def __init__(self, filename):
