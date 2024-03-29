@@ -18,10 +18,10 @@ class Player:
         return selections
 
     def add_gems_to_hand_single(self, gem_type):
-        if gem_type in self.gems_in_hand:
-            self.gems_in_hand += gem_type
+        if isinstance(gem_type, list):
+            self.gems_in_hand.extend(gem_type)
         else:
-            self.gems_in_hand = gem_type
+            self.gems_in_hand.append(gem_type)
 
     def reserve_card(self, card):
         self.reserved_cards.append(card)
