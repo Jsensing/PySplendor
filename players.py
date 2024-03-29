@@ -12,22 +12,16 @@ class Player:
             print("Select a gem type:")
             for i, gem in enumerate(gem_options, 1):
                 print(f"{i}) {gem.capitalize()}")
-            while True:
-                choice = int(input("Enter your choice (1-5): "))
-                if choice in range(1, 6):
-                    break
-                else:
-                    print("Invalid choice. Please enter a number between 1 and 5.")
-            gem_type = gem_options.pop(choice - 1)  # Remove the selected gem type
+            choice = int(input("Enter your choice (1-5): "))
+            gem_type = gem_options[choice - 1]  # Get the selected gem type
             selections.append(gem_type)
-        for gem_type in selections:
-            self.add_gems_to_hand_single(gem_type)
+        return selections
 
     def add_gems_to_hand_single(self, gem_type):
         if gem_type in self.gems_in_hand:
-            self.gems_in_hand[gem_type] += 1  # Increase the quantity by 1
+            self.gems_in_hand += gem_type
         else:
-            self.gems_in_hand[gem_type] = 1  # Add the gem with a quantity of 1
+            self.gems_in_hand = gem_type
 
     def reserve_card(self, card):
         self.reserved_cards.append(card)
