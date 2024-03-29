@@ -1,9 +1,9 @@
 class Player:
     def __init__(self):
-        self.gems_in_hand = {}  # Dictionary to store gems and their quantities
+        self.gems_in_hand = []  # Dictionary to store gems and their quantities
         self.reserved_cards = []  # List to store reserved cards
         self.vp = 0  # Victory points
-        self.gems_in_play = {}  # Dictionary to store gems in play and their quantities
+        self.gems_in_play = []  # Dictionary to store gems in play and their quantities
 
     def add_3gems_to_hand(self):
         gem_options = ["Diamond", "Ruby", "Emerald", "Sapphire", "Onyx"]
