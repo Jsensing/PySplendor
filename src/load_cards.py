@@ -1,6 +1,7 @@
 import pandas as pd
 from src.card import DevelopmentCard
 
+file_path = "../cards.txt"
 def load_cards_from_csv(file_path):
     df = pd.read_csv(file_path, names=["level", "color", "costWhite", "costBlue", "costGreen", "costRed", "costBlack", "bonus"])
 
