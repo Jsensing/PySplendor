@@ -19,6 +19,8 @@ COLOR_MAP = {
 class UI:
     def __init__(self, screen):
         self.screen = screen
+        self.red_card_image = pygame.image.load("assets/ruby.jpg")  # Load the red card image
+        self.red_card_image = pygame.transform.scale(self.red_card_image, (CARD_WIDTH, CARD_HEIGHT))  # Resize
 
     def render_grid(self, grid):
         """Renders the 4x3 grid of cards."""
@@ -31,22 +33,26 @@ class UI:
                 y = (3 - row) * (CARD_HEIGHT + MARGIN_Y) + 50
 
                 # Draw card background
-                pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))
+                if card.color == "Red":
+                    self.screen.blit(self.red_card_image, (x, y))  # Use red card image
+                else:
+                    pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))  # Normal background
+                
                 pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CARD_WIDTH, CARD_HEIGHT), 2)  # Border
 
                 # Draw the bonus points at the TOP LEFT corner
-                bonus_text = font.render(f"{card.bonus}", True, (0, 0, 0))
+                bonus_text = font.render(f"+{card.bonus}", True, (0, 0, 0))
                 self.screen.blit(bonus_text, (x + 5, y + 5))
 
                 # Draw the color name at the TOP CENTER of the card
                 color_text = font.render(card.color, True, COLOR_MAP.get(card.color, (0, 0, 0)))
-                color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + 10))  # Positioned at top center
+                color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + 10))
                 self.screen.blit(color_text, color_rect)
 
                 # Draw costs in the bottom-left corner
-                cost_x, cost_y = x + 5, y + CARD_HEIGHT - 20  # Bottom-left positioning
+                cost_x, cost_y = x + 5, y + CARD_HEIGHT - 20
                 for color, cost in card.cost.items():
-                    if cost > 0:  # Only display costs greater than zero
+                    if cost > 0:
                         cost_text = font.render(f"{color[0]}: {cost}", True, COLOR_MAP.get(color, (0, 0, 0)))
                         self.screen.blit(cost_text, (cost_x, cost_y))
                         cost_y -= 20  # Move text up for the next cost
