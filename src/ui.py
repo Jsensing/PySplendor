@@ -28,7 +28,7 @@ COLOR_NAME_MAP = {
 class UI:
     def __init__(self, screen):
         self.screen = screen
-        self.ruby_card_image = pygame.image.load("assets/red_card.png")  # Load Ruby (Red) card image
+        self.ruby_card_image = pygame.image.load("assets/cardImg/ruby.jpg")  # Load Ruby (Red) card image
         self.ruby_card_image = pygame.transform.scale(self.ruby_card_image, (CARD_WIDTH, CARD_HEIGHT))  # Resize
 
     def render_grid(self, grid):
@@ -53,7 +53,7 @@ class UI:
                 pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CARD_WIDTH, CARD_HEIGHT), 2)  # Border
 
                 # Draw the bonus points at the TOP LEFT corner
-                bonus_text = font.render(f"+{card.bonus}", True, (0, 0, 0))
+                bonus_text = font.render(f" {card.bonus}", True, (0, 0, 0))
                 self.screen.blit(bonus_text, (x + 5, y + 5))
 
                 # Draw the new color name at the TOP CENTER of the card
