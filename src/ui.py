@@ -19,7 +19,7 @@ COLOR_MAP = {
 class UI:
     def __init__(self, screen):
         self.screen = screen
-        self.red_card_image = pygame.image.load("assets/red_card.png")  # Load the red card image
+        self.red_card_image = pygame.image.load("assets/ruby.jpg")  # Load the red card image
         self.red_card_image = pygame.transform.scale(self.red_card_image, (CARD_WIDTH, CARD_HEIGHT))  # Resize
 
     def render_grid(self, grid):
