@@ -4,13 +4,15 @@ import pygame
 CARD_WIDTH, CARD_HEIGHT = 150, 200  # Bigger cards
 MARGIN_X = 30  # Horizontal space between cards
 MARGIN_Y = 30  # Vertical space between rows
+NOBLE_CARD_SIZE = 120  # Square noble cards
 
 GRID_COLUMNS = 4  # 4 cards per row
 GRID_ROWS = 3  # 3 rows for levels
+TOP_CARDS = 3  # Number of noble cards
 
 # ✅ Dynamically set screen size based on card dimensions and margins
 WIDTH = (CARD_WIDTH + MARGIN_X) * GRID_COLUMNS + 50  # Adjusted width
-HEIGHT = (CARD_HEIGHT + MARGIN_Y) * GRID_ROWS + 100  # Adjusted height
+HEIGHT = (CARD_HEIGHT + MARGIN_Y) * GRID_ROWS + 200  # Adjusted height
 
 # Color Mapping for Display Text
 COLOR_MAP = {
@@ -32,8 +34,9 @@ COLOR_NAME_MAP = {
 }
 
 class UI:
-    def __init__(self, screen):
+    def __init__(self, screen, noble_cards):
         self.screen = screen
+        self.noble_cards = noble_cards
 
         # Load images for each card type and resize them
         self.card_images = {
@@ -48,6 +51,28 @@ class UI:
         """Renders the 4x3 grid of cards with increased spacing."""
         self.screen.fill((255, 255, 255))  # Clear the screen
         font = pygame.font.Font(None, 30)  # Increased font size
+        
+        # Render the 3 noble cards at the top
+        for i, noble_card in enumerate(self.noble_cards):
+            x = i * (NOBLE_CARD_SIZE + MARGIN_X) + 150
+            y = 20  # Position noble cards at the top
+
+            # Draw square noble card background
+            pygame.draw.rect(self.screen, (180, 180, 180), (x, y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
+            pygame.draw.rect(self.screen, (0, 0, 0), (x, y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE), 2)  # Border
+
+            # Render noble points at the top of the noble card
+            points_text = font.render(f"{noble_card.points}", True, (0, 0, 0))
+            self.screen.blit(points_text, (x + 50, y + 10))
+
+            # Render cost in the bottom-left of the noble card
+            cost_x, cost_y = x + 5, y + NOBLE_CARD_SIZE - 30
+            for color, cost in noble_card.cost.items():
+                if cost > 0:
+                    text_color = COLOR_MAP.get(color, (0, 0, 0))
+                    cost_text = font.render(f"{color[0]}: {cost}", True, text_color)
+                    self.screen.blit(cost_text, (cost_x, cost_y))
+                    cost_y -= 20  # Move text up for the next cost
 
         for row in range(3, 0, -1):  # From Level 3 (top) to Level 1 (bottom)
             for col, card in enumerate(grid[row]):
