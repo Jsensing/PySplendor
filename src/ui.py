@@ -3,7 +3,8 @@ import pygame
 # Constants
 WIDTH, HEIGHT = 800, 600
 CARD_WIDTH, CARD_HEIGHT = 100, 150
-MARGIN_X, MARGIN_Y = 20
+MARGIN_X = 20 
+MARGIN_Y = 20
 
 class UI:
     def __init__(self, screen):
