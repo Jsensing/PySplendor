@@ -34,6 +34,10 @@ class UI:
                 pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))
                 pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CARD_WIDTH, CARD_HEIGHT), 2)  # Border
 
+                # Draw the bonus points at the TOP LEFT corner
+                bonus_text = font.render(f"{card.bonus}", True, (0, 0, 0))
+                self.screen.blit(bonus_text, (x + 5, y + 5))
+
                 # Draw the color name at the TOP CENTER of the card
                 color_text = font.render(card.color, True, COLOR_MAP.get(card.color, (0, 0, 0)))
                 color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + 10))  # Positioned at top center
