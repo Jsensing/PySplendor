@@ -8,7 +8,7 @@ MARGIN_Y = 20
 
 # Color Mapping for Display Text
 COLOR_MAP = {
-    "Diamond": (255, 255, 255),  # White -> Diamond
+    "Diamond": (128, 128, 128),  # Gray for Diamond (White)
     "Sapphire": (0, 0, 255),  # Blue -> Sapphire
     "Emerald": (0, 255, 0),  # Green -> Emerald
     "Ruby": (255, 0, 0),  # Red -> Ruby
@@ -68,12 +68,16 @@ class UI:
                 color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + 10))
                 self.screen.blit(color_text, color_rect)
 
-                # ✅ Keep the bottom-left cost values in their respective colors
+                # ✅ Keep the bottom-left cost values in their respective colors (Diamond in gray)
                 cost_x, cost_y = x + 5, y + CARD_HEIGHT - 20  # Bottom-left positioning
                 for color, cost in card.cost.items():
                     if cost > 0:
                         # Convert old cost color name to new color name
                         new_cost_color = COLOR_NAME_MAP.get(color, color)
-                        cost_text = font.render(f"{new_cost_color[0]}: {cost}", True, COLOR_MAP.get(new_cost_color, (0, 0, 0)))  # Keep original color
+                        
+                        # ✅ Special case: Diamond (White) costs should be gray
+                        text_color = (128, 128, 128) if new_cost_color == "Diamond" else COLOR_MAP.get(new_cost_color, (0, 0, 0))
+
+                        cost_text = font.render(f"{new_cost_color[0]}: {cost}", True, text_color)  # Apply color
                         self.screen.blit(cost_text, (cost_x, cost_y))
                         cost_y -= 20  # Move text up for the next cost
