@@ -20,28 +20,23 @@ class UI:
     def __init__(self, screen):
         self.screen = screen
 
-    def render_grid(self, grid):
+    def render_grid(screen, grid):
         """Renders the 4x3 grid of cards."""
-        self.screen.fill((255, 255, 255))  # Clear the screen
-        font = pygame.font.Font(None, 24)  # Font for text
+        screen.fill((255, 255, 255))  # Clear the screen
+        font = pygame.font.Font(None, 24)  # Font for rendering text
 
-        for row in range(3, 0, -1):  # From Level 3 (top) to Level 1 (bottom)
+        for row in range(3, 0, -1):  # From top (level 3) to bottom (level 1)
             for col, card in enumerate(grid[row]):
                 x = col * (CARD_WIDTH + MARGIN_X) + 100
                 y = (3 - row) * (CARD_HEIGHT + MARGIN_Y) + 50
 
                 # Draw card background
-                pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))
+                pygame.draw.rect(screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))
 
-                # Draw the color name in the center
-                color_text = font.render(card.color, True, COLOR_MAP.get(card.color, (0, 0, 0)))
-                color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + CARD_HEIGHT // 2))
-                self.screen.blit(color_text, color_rect)
+                # Render and center the color text
+                text = font.render(card.color, True, (0, 0, 0))
+                text_width, text_height = text.get_size()
+                text_x = x + (CARD_WIDTH // 2) - (text_width // 2)
+                text_y = y + 5
+                screen.blit(text, (text_x, text_y))
 
-                # Draw costs in the bottom-left corner
-                cost_x, cost_y = x + 5, y + CARD_HEIGHT - 20  # Bottom-left positioning
-                for color, cost in card.cost.items():
-                    if cost > 0:  # Only display costs greater than zero
-                        cost_text = font.render(f"{color[0]}: {cost}", True, COLOR_MAP.get(color, (0, 0, 0)))
-                        self.screen.blit(cost_text, (cost_x, cost_y))
-                        cost_y -= 20  # Move text up for the next cost
