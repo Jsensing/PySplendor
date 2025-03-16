@@ -26,7 +26,11 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            running = False  # Close when clicking the close button
+
+        # ✅ Close game when pressing the ESC key
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            running = False  # Exit the loop
 
     ui.render_grid(grid)  # Render updated grid
     pygame.display.flip()
