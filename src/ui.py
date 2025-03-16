@@ -1,44 +1,40 @@
 import pygame
 
-# Constants - Increased screen size to fit all cards properly
-CARD_WIDTH, CARD_HEIGHT = 150, 200  # Bigger cards
-MARGIN_X = 30  # Horizontal space between cards
-MARGIN_Y = 30  # Vertical space between rows
-NOBLE_CARD_SIZE = 120  # Square noble cards
+# ✅ Initialize Pygame to get the usable screen size (excluding taskbar)
+pygame.init()
+screen_info = pygame.display.Info()
+SCREEN_WIDTH = screen_info.current_w  # Full screen width
+SCREEN_HEIGHT = screen_info.current_h  # Full screen height, including taskbar
 
-GRID_COLUMNS = 4  # 4 cards per row
+# ✅ Grid Layout
+GRID_COLUMNS = 4  # 4 main cards per row
 GRID_ROWS = 3  # 3 rows for levels
 TOP_CARDS = 3  # Number of noble cards
 
-# ✅ Dynamically set screen size based on card dimensions and margins
-WIDTH = (CARD_WIDTH + MARGIN_X) * GRID_COLUMNS + 50  # Adjusted width
-HEIGHT = (CARD_HEIGHT + MARGIN_Y) * GRID_ROWS + 200  # Adjusted height
+# ✅ Dynamic Sizing Based on Screen Resolution
+MARGIN_X_RATIO = 0.02  # 2% of screen width for spacing
+MARGIN_Y_RATIO = 0.03  # 3% of screen height for spacing
 
-# Color Mapping for Display Text
-COLOR_MAP = {
-    "Diamond": (128, 128, 128),  # Gray for Diamond (White)
-    "Sapphire": (0, 0, 255),  # Blue -> Sapphire
-    "Emerald": (0, 255, 0),  # Green -> Emerald
-    "Ruby": (255, 0, 0),  # Red -> Ruby
-    "Onyx": (0, 0, 0),  # Black -> Onyx
-    "Gold": (255, 215, 0)  # Gold (Joker)
-}
+CARD_WIDTH = int(SCREEN_WIDTH * 0.15)  # 15% of screen width
+CARD_HEIGHT = int(SCREEN_HEIGHT * 0.2)  # 20% of screen height
+NOBLE_CARD_SIZE = int(SCREEN_WIDTH * 0.12)  # 12% of screen width (square)
 
-# Mapping Old Colors to New Names
-COLOR_NAME_MAP = {
-    "White": "Diamond",
-    "Blue": "Sapphire",
-    "Green": "Emerald",
-    "Red": "Ruby",
-    "Black": "Onyx"
-}
+MARGIN_X = int(SCREEN_WIDTH * MARGIN_X_RATIO)
+MARGIN_Y = int(SCREEN_HEIGHT * MARGIN_Y_RATIO)
+
+# ✅ Create a TRUE FULLSCREEN Window That Covers Taskbar
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN | pygame.NOFRAME)
+
+# ✅ Debugging: Print Screen and Card Sizes
+print(f"Usable screen size: {SCREEN_WIDTH}x{SCREEN_HEIGHT}")
+print(f"Card size: {CARD_WIDTH}x{CARD_HEIGHT}, Noble size: {NOBLE_CARD_SIZE}x{NOBLE_CARD_SIZE}")
 
 class UI:
     def __init__(self, screen, noble_cards):
         self.screen = screen
         self.noble_cards = noble_cards
 
-        # Load images for each card type and resize them
+        # Load images for each card type and resize them dynamically
         self.card_images = {
             "Ruby": pygame.transform.scale(pygame.image.load("assets/cardImg/ruby.jpg"), (CARD_WIDTH, CARD_HEIGHT)),
             "Diamond": pygame.transform.scale(pygame.image.load("assets/cardImg/diamond.jpg"), (CARD_WIDTH, CARD_HEIGHT)),
@@ -48,63 +44,33 @@ class UI:
         }
 
     def render_grid(self, grid):
-        """Renders the 4x3 grid of cards with increased spacing."""
+        """Renders the 3 noble cards at the top and the 4x3 grid below with equal spacing."""
         self.screen.fill((255, 255, 255))  # Clear the screen
-        font = pygame.font.Font(None, 30)  # Increased font size
-        
-        # Render the 3 noble cards at the top
-        for i, noble_card in enumerate(self.noble_cards):
-            x = i * (NOBLE_CARD_SIZE + MARGIN_X) + 150
-            y = 20  # Position noble cards at the top
+        font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.03))  # Scale font size dynamically
 
-            # Draw square noble card background
-            pygame.draw.rect(self.screen, (180, 180, 180), (x, y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
-            pygame.draw.rect(self.screen, (0, 0, 0), (x, y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE), 2)  # Border
+        # ✅ Center noble cards horizontally and distribute evenly
+        noble_start_x = (SCREEN_WIDTH - ((NOBLE_CARD_SIZE + MARGIN_X) * TOP_CARDS - MARGIN_X)) // 2
+        noble_y = int(SCREEN_HEIGHT * 0.05)  # Moves noble cards slightly lower
+
+        for i, noble_card in enumerate(self.noble_cards):
+            x = noble_start_x + i * (NOBLE_CARD_SIZE + MARGIN_X)
+
+            # Draw noble card background
+            pygame.draw.rect(self.screen, (180, 180, 180), (x, noble_y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
+            pygame.draw.rect(self.screen, (0, 0, 0), (x, noble_y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE), 2)  # Border
 
             # Render noble points at the top of the noble card
             points_text = font.render(f"{noble_card.points}", True, (0, 0, 0))
-            self.screen.blit(points_text, (x + 50, y + 10))
+            self.screen.blit(points_text, (x + NOBLE_CARD_SIZE // 3, noble_y + 10))
 
-            # Render cost in the bottom-left of the noble card
-            cost_x, cost_y = x + 5, y + NOBLE_CARD_SIZE - 30
-            for color, cost in noble_card.cost.items():
-                if cost > 0:
-                    text_color = COLOR_MAP.get(color, (0, 0, 0))
-                    cost_text = font.render(f"{color[0]}: {cost}", True, text_color)
-                    self.screen.blit(cost_text, (cost_x, cost_y))
-                    cost_y -= 20  # Move text up for the next cost
+        # ✅ Adjust grid Y position to space evenly below noble cards
+        grid_start_y = noble_y + NOBLE_CARD_SIZE + (MARGIN_Y * 4)  # ✅ More spacing to prevent overlap
 
         for row in range(3, 0, -1):  # From Level 3 (top) to Level 1 (bottom)
             for col, card in enumerate(grid[row]):
-                x = col * (CARD_WIDTH + MARGIN_X) + 50  # Adjusted position
-                y = (3 - row) * (CARD_HEIGHT + MARGIN_Y) + 50  # Adjusted position
+                x = col * (CARD_WIDTH + MARGIN_X) + (SCREEN_WIDTH - (GRID_COLUMNS * (CARD_WIDTH + MARGIN_X))) // 2
+                y = grid_start_y + (3 - row) * (CARD_HEIGHT + MARGIN_Y)
 
-                # Convert old color names to new names
-                new_color_name = COLOR_NAME_MAP.get(card.color, card.color)  # Default to original if not mapped
-
-                # Draw card background using images
-                if new_color_name in self.card_images:
-                    self.screen.blit(self.card_images[new_color_name], (x, y))  # Display corresponding image
-                else:
-                    pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))  # Default background
-                
+                # Draw main card background
+                pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))
                 pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CARD_WIDTH, CARD_HEIGHT), 2)  # Border
-
-                # Move bonus points closer to the top-left corner
-                bonus_text = font.render(f"{card.bonus}", True, (0, 0, 0))  # Always black
-                self.screen.blit(bonus_text, (x + 5, y + 5))  # Moved slightly up
-
-                # Move the card name lower to avoid overlap
-                color_text = font.render(new_color_name, True, (0, 0, 0))  # Force black text
-                color_rect = color_text.get_rect(center=(x + CARD_WIDTH // 2, y + 15))  # Moved down slightly
-                self.screen.blit(color_text, color_rect)
-
-                # Keep the bottom-left cost values in their respective colors (Diamond in gray)
-                cost_x, cost_y = x + 5, y + CARD_HEIGHT - 30  # Bottom-left positioning, moved slightly up
-                for color, cost in card.cost.items():
-                    if cost > 0:
-                        new_cost_color = COLOR_NAME_MAP.get(color, color)
-                        text_color = (128, 128, 128) if new_cost_color == "Diamond" else COLOR_MAP.get(new_cost_color, (0, 0, 0))
-                        cost_text = font.render(f"{new_cost_color[0]}: {cost}", True, text_color)  # Apply color
-                        self.screen.blit(cost_text, (cost_x, cost_y))
-                        cost_y -= 25  # Increased spacing to prevent overlap
