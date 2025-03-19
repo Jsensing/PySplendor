@@ -16,6 +16,10 @@ NOBLE_CARD_SIZE = int(SCREEN_WIDTH * 0.12)  # 12% of screen width (square)
 MARGIN_X = int(SCREEN_WIDTH * 0.02)  # 2% of screen width for spacing
 MARGIN_Y = int(SCREEN_HEIGHT * 0.03)  # 3% of screen height for spacing
 
+# Space for player hands on left & right
+PLAYER_PANEL_WIDTH = int(SCREEN_WIDTH * 0.18)  # 18% of screen width for player hands
+GAME_AREA_WIDTH = SCREEN_WIDTH - (PLAYER_PANEL_WIDTH * 2)  # Remaining area for game board
+
 # Color mapping for cost text (for nobles and regular cards)
 COST_COLOR_MAP = {
     "Diamond": (128, 128, 128),  # Gray for Diamond (White)
@@ -25,23 +29,16 @@ COST_COLOR_MAP = {
     "Onyx": (0, 0, 0),  # Black -> Onyx
 }
 
-# Mapping Old Colors to New Names for Cost Text
-COLOR_NAME_MAP = {
-    "White": "Diamond",
-    "Blue": "Sapphire",
-    "Green": "Emerald",
-    "Red": "Ruby",
-    "Black": "Onyx"
-}
-
 class UI:
-    def __init__(self, screen, noble_cards):
+    def __init__(self, screen, noble_cards, player1, player2):
         self.screen = screen
         self.noble_cards = noble_cards
+        self.player1 = player1
+        self.player2 = player2
 
         # Get absolute paths for images
         card_assets_path = os.path.abspath("assets/cardImg")
-        noble_img_path = os.path.abspath("assets/nobleImg/noble.jpg")  # ✅ One noble image for all
+        noble_img_path = os.path.abspath("assets/nobleImg/noble.jpg")  # One noble image for all
 
         # Load the **same noble image** for all nobles
         self.noble_image = None
@@ -54,90 +51,71 @@ class UI:
         else:
             print(f"⚠️ Warning: Noble image not found {noble_img_path}")
 
-        # Load card images for each type
-        self.card_images = {}
-        card_types = ["Ruby", "Diamond", "Emerald", "Sapphire", "Onyx"]
+    def render_player_hand(self, player, x, y):
+        # Renders the player's tokens, points, and owned cards at a given x position.
+        font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.025))  # Adjust font size
 
-        for card in card_types:
-            img_path = os.path.join(card_assets_path, f"{card.lower()}.jpg")
+        # Draw the player panel
+        pygame.draw.rect(self.screen, (220, 220, 220), (x, y, PLAYER_PANEL_WIDTH, SCREEN_HEIGHT - 40))  # Background
+        pygame.draw.rect(self.screen, (0, 0, 0), (x, y, PLAYER_PANEL_WIDTH, SCREEN_HEIGHT - 40), 2)  # Border
 
-            if os.path.exists(img_path):  # Check if file exists
-                try:
-                    original_img = pygame.image.load(img_path)
-                    self.card_images[card] = pygame.transform.scale(original_img, (CARD_WIDTH, CARD_HEIGHT))
-                except pygame.error as e:
-                    print(f"❌ Failed to load card image {img_path}: {e}")
-                    self.card_images[card] = None  # Fallback to gray
-            else:
-                print(f"⚠️ Warning: Card image not found {img_path}")  # Debugging message
-                self.card_images[card] = None  # Fallback to gray if missing
+        # Display Player Points
+        points_text = font.render(f"Points: {player.points}", True, (0, 0, 0))
+        self.screen.blit(points_text, (x + 10, y + 10))
+
+        # Display Player Tokens (Color-Coded)
+        token_y = y + 50
+        for color, amount in player.tokens.items():
+            text_color = COST_COLOR_MAP.get(color, (0, 0, 0))  # Get mapped color
+            token_text = font.render(f"{color[0]}: {amount}", True, text_color)
+            self.screen.blit(token_text, (x + 10, token_y))
+            token_y += 30
+
+        # Display Player's Owned Cards (Small Previews)
+        card_y = token_y + 20
+        for card in player.cards:  # FIX: Use player.cards instead of player.owned_cards
+            card_text = font.render(card.color, True, (0, 0, 0))
+            self.screen.blit(card_text, (x + 10, card_y))
+            card_y += 25  # Space out card previews
 
     def render_grid(self, grid):
-        """Renders the 3 noble cards at the top and the 4x3 grid below with text drawn properly."""
-        self.screen.fill((255, 255, 255))  # Clear the screen before drawing
+        # Renders the game grid and player hands.
+        self.screen.fill((255, 255, 255))  # Clear screen
+
+        # Render Player Hands on Left & Right
+        self.render_player_hand(self.player1, 10, 10)  # Left side
+        self.render_player_hand(self.player2, SCREEN_WIDTH - PLAYER_PANEL_WIDTH - 10, 10)  # Right side
+
         font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.03))  # Scale font size dynamically
 
-        # Center noble cards horizontally and distribute evenly
-        noble_start_x = (SCREEN_WIDTH - ((NOBLE_CARD_SIZE + MARGIN_X) * 3 - MARGIN_X)) // 2
-        noble_y = int(SCREEN_HEIGHT * 0.05)  # Moves noble cards slightly lower
+        # Render nobles (Centered)
+        noble_start_x = (GAME_AREA_WIDTH - ((NOBLE_CARD_SIZE + MARGIN_X) * 3 - MARGIN_X)) // 2 + PLAYER_PANEL_WIDTH
+        noble_y = int(SCREEN_HEIGHT * 0.05)
 
         for i, noble_card in enumerate(self.noble_cards):
             x = noble_start_x + i * (NOBLE_CARD_SIZE + MARGIN_X)
 
-            # Draw noble card background using the **same image** for all nobles
+            # Draw noble card image
             if self.noble_image:
                 self.screen.blit(self.noble_image, (x, noble_y))
-            else:
-                pygame.draw.rect(self.screen, (180, 180, 180), (x, noble_y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
-
-            pygame.draw.rect(self.screen, (0, 0, 0), (x, noble_y, NOBLE_CARD_SIZE, NOBLE_CARD_SIZE), 2)  # Border
 
             # Render noble points at the **top left**
             points_text = font.render(str(noble_card.points), True, (0, 0, 0))
             self.screen.blit(points_text, (x + 5, noble_y + 5))  # Top left position
 
-            # Render noble cost in correct color (Bottom Left)
-            cost_x, cost_y = x + 5, noble_y + NOBLE_CARD_SIZE - 30
-            for color, cost in noble_card.cost.items():
-                if cost > 0:
-                    mapped_color = COLOR_NAME_MAP.get(color, color)  # Convert "White" -> "Diamond"
-                    text_color = COST_COLOR_MAP.get(mapped_color, (0, 0, 0))  # Get mapped color
-                    cost_text = font.render(f"{mapped_color[0]}: {cost}", True, text_color)
-                    self.screen.blit(cost_text, (cost_x, cost_y))
-                    cost_y -= 20  # Move text up for the next cost
-
-        # Adjust grid Y position to space below noble cards
+        # Adjust grid Y position
         grid_start_y = noble_y + NOBLE_CARD_SIZE + (MARGIN_Y * 4)
 
-        for row in range(3, 0, -1):  # From Level 3 (top) to Level 1 (bottom)
+        for row in range(3, 0, -1):
             for col, card in enumerate(grid[row]):
-                x = col * (CARD_WIDTH + MARGIN_X) + (SCREEN_WIDTH - (4 * (CARD_WIDTH + MARGIN_X))) // 2
+                x = col * (CARD_WIDTH + MARGIN_X) + (GAME_AREA_WIDTH - (4 * (CARD_WIDTH + MARGIN_X))) // 2 + PLAYER_PANEL_WIDTH
                 y = grid_start_y + (3 - row) * (CARD_HEIGHT + MARGIN_Y)
 
-                # Display card image if available
-                card_type = card.color
-                if card_type in self.card_images and self.card_images[card_type]:
-                    self.screen.blit(self.card_images[card_type], (x, y))
-                else:
-                    pygame.draw.rect(self.screen, (200, 200, 200), (x, y, CARD_WIDTH, CARD_HEIGHT))  # ✅ Default gray background
-            
-                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CARD_WIDTH, CARD_HEIGHT), 2)  # ✅ Border
+                # Draw card image
+                card_text = font.render(card.color, True, (0, 0, 0))
+                self.screen.blit(card_text, (x + CARD_WIDTH // 2 - 20, y + 10))
 
-                # Render card name in **black** at the **top center**
-                name_text = font.render(card_type, True, (0, 0, 0))  # Black text for name
-                name_rect = name_text.get_rect(center=(x + CARD_WIDTH // 2, y + 15))  # Centered name
-                self.screen.blit(name_text, name_rect)
-
-                # Render bonus points (Top Left)
-                bonus_text = font.render(str(card.bonus), True, (0, 0, 0))
-                self.screen.blit(bonus_text, (x + 5, y + 5))
-
-                # Render cost in correct color (Bottom Left)
-                cost_x, cost_y = x + 5, y + CARD_HEIGHT - 30
-                for color, cost in card.cost.items():
-                    if cost > 0:
-                        mapped_color = COLOR_NAME_MAP.get(color, color)  # Convert "White" -> "Diamond"
-                        text_color = COST_COLOR_MAP.get(mapped_color, (0, 0, 0))  # Get mapped color
-                        cost_text = font.render(f"{mapped_color[0]}: {cost}", True, text_color)
-                        self.screen.blit(cost_text, (cost_x, cost_y))
-                        cost_y -= 20  # Move text up for the next cost
+    def render_players(self):
+        # Renders player tokens, points, and cards on both sides of the screen.
+        self.render_player_hand(self.player1, 10, 10)  # Left side
+        self.render_player_hand(self.player2, SCREEN_WIDTH - PLAYER_PANEL_WIDTH - 10, 10)  # Right side

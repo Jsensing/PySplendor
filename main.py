@@ -1,4 +1,5 @@
 import pygame
+from src.player import Player
 from src.ui import UI  # ✅ Only import UI (WIDTH & HEIGHT set dynamically here)
 from src.load_cards import load_cards_from_csv, load_noble_cards
 from src.grid import organize_cards
@@ -19,7 +20,9 @@ noble_cards = load_noble_cards("nobles.txt")  # Update with actual CSV path
 # ✅ Load game cards and create UI
 cards = load_cards_from_csv("cards.txt")
 grid = organize_cards(cards)
-ui = UI(screen, noble_cards)
+player1 = Player("Player 1")
+player2 = Player("Player 2")
+ui = UI(screen, noble_cards, player1, player2)
 
 # ✅ Main game loop
 running = True

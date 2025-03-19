@@ -1,15 +1,18 @@
 class Player:
     def __init__(self, name):
         self.name = name
-        self.tokens = {"Emerald": 0, "Diamond": 0, "Sapphire": 0, "Onyx": 0, "Ruby": 0, "Gold": 0}
-        self.cards = []  # List of DevelopmentCard objects
-        self.nobles = []
-        self.prestige = 0
+        self.tokens = {"Diamond": 0, "Sapphire": 0, "Emerald": 0, "Ruby": 0, "Onyx": 0, "Gold": 0}
+        self.points = 0
+        self.cards = []  # List of acquired cards
 
-    def take_tokens(self, color, amount):
-        if self.tokens[color] + amount <= 10:
+    def add_token(self, color, amount=1):
+        if color in self.tokens:
             self.tokens[color] += amount
 
-    def buy_card(self, card):
-        # Logic for checking token cost and purchasing
-        pass
+    def remove_token(self, color, amount=1):
+        if color in self.tokens and self.tokens[color] >= amount:
+            self.tokens[color] -= amount
+
+    def add_card(self, card):
+        self.cards.append(card)
+        self.points += card.bonus  # Assuming the card has a bonus (points)
