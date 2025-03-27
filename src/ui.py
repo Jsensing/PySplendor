@@ -82,6 +82,11 @@ class UI:
 
         for i, noble_card in enumerate(self.noble_cards):
             x = noble_start_x + i * (NOBLE_CARD_SIZE + MARGIN_X)
+
+            # Draw noble border
+            border_rect = pygame.Rect(x - 3, noble_y - 3, NOBLE_CARD_SIZE + 6, NOBLE_CARD_SIZE + 6)
+            pygame.draw.rect(self.screen, (0, 0, 0), border_rect, 2)
+
             if self.noble_image:
                 self.screen.blit(self.noble_image, (x, noble_y))
 
@@ -106,6 +111,10 @@ class UI:
                 x = PLAYER_PANEL_WIDTH + (GAME_AREA_WIDTH - total_card_width) // 2 + col * (CARD_WIDTH + MARGIN_X)
                 y = grid_start_y + (3 - row) * (CARD_HEIGHT + MARGIN_Y)
 
+                # Draw development card border
+                border_rect = pygame.Rect(x - 3, y - 3, CARD_WIDTH + 6, CARD_HEIGHT + 6)
+                pygame.draw.rect(self.screen, (0, 0, 0), border_rect, 2)
+
                 card_color = getattr(card, "color", "Unknown")
                 card_points = getattr(card, "points", 0)
                 card_cost = getattr(card, "cost", {})
@@ -120,7 +129,7 @@ class UI:
                 self.screen.blit(card_text, (x + 5, y + 5))
 
                 cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02 * SHRINK_FACTOR))
-                cost_y = y + CARD_HEIGHT - 60
+                cost_y = y + 35
                 for color, amount in card_cost.items():
                     text_color = COST_COLOR_MAP.get(color.lower(), (0, 0, 0))
                     cost_text = cost_font.render(f"{color[0]}: {amount}", True, text_color)
