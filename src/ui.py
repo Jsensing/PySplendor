@@ -10,11 +10,11 @@ SCREEN_HEIGHT = pygame.display.Info().current_h
 
 # Dynamic Card & Noble Sizing
 CARD_WIDTH = int(SCREEN_WIDTH * 0.15)
-CARD_HEIGHT = int(SCREEN_HEIGHT * 0.18)  # Reduced height slightly for better fit
+CARD_HEIGHT = int(SCREEN_HEIGHT * 0.17)  # Reduced height to prevent cutoff
 NOBLE_CARD_SIZE = int(SCREEN_WIDTH * 0.12)
 
 MARGIN_X = int(SCREEN_WIDTH * 0.02)
-MARGIN_Y = int(SCREEN_HEIGHT * 0.025)
+MARGIN_Y = int(SCREEN_HEIGHT * 0.02)  # Reduced vertical margin for tighter layout
 
 # Player UI Panels
 PLAYER_PANEL_WIDTH = int(SCREEN_WIDTH * 0.18)
@@ -81,8 +81,19 @@ class UI:
             x = noble_start_x + i * (NOBLE_CARD_SIZE + MARGIN_X)
             if self.noble_image:
                 self.screen.blit(self.noble_image, (x, noble_y))
+
             points_text = font.render(str(getattr(noble_card, "points", 0)), True, (0, 0, 0))
             self.screen.blit(points_text, (x + 5, noble_y + 5))
+
+            # Render noble cost ON TOP of image (color coded)
+            cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02))
+            noble_cost = getattr(noble_card, "cost", {})
+            cost_y = noble_y + 30
+            for color, amount in noble_cost.items():
+                text_color = COST_COLOR_MAP.get(color, (0, 0, 0))
+                cost_text = cost_font.render(f"{color[0]}: {amount}", True, text_color)
+                self.screen.blit(cost_text, (x + 5, cost_y))
+                cost_y += 20
 
         # 🔧 Adjust layout to fit all card rows
         grid_start_y = noble_y + NOBLE_CARD_SIZE + int(SCREEN_HEIGHT * 0.02)
@@ -109,7 +120,8 @@ class UI:
                 cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02))
                 cost_y = y + CARD_HEIGHT - 60
                 for color, amount in card_cost.items():
-                    cost_text = cost_font.render(f"{color[0]}: {amount}", True, COST_COLOR_MAP.get(color, (0, 0, 0)))
+                    text_color = COST_COLOR_MAP.get(color, (0, 0, 0))
+                    cost_text = cost_font.render(f"{color[0]}: {amount}", True, text_color)
                     self.screen.blit(cost_text, (x + 5, cost_y))
                     cost_y += 20
 
