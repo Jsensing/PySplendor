@@ -1,10 +1,10 @@
 import random
 
 def organize_cards(cards):
-    # Separate by levels
-    level_1 = [card for card in cards if card.level == 1]
-    level_2 = [card for card in cards if card.level == 2]
-    level_3 = [card for card in cards if card.level == 3]
+    # Separate by tiers (was 'level', now 'tier' to match CSV and card object)
+    level_1 = [card for card in cards if card.tier == 1]
+    level_2 = [card for card in cards if card.tier == 2]
+    level_3 = [card for card in cards if card.tier == 3]
 
     # Shuffle for randomness
     random.shuffle(level_1)

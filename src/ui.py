@@ -1,5 +1,6 @@
 import pygame
 import os
+import csv
 
 # Initialize Pygame before using display functions
 pygame.init()
@@ -44,6 +45,29 @@ def load_scaled_image(path, size):
         print(f"Image not found: {path}")
     return None
 
+def load_cards_from_csv(csv_path):
+    cards = []
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if len(row) != 8:
+                continue  # skip malformed rows
+            tier, color, diamond, sapphire, emerald, ruby, onyx, points = row
+            card = type("Card", (object,), {
+                "tier": int(tier),
+                "color": color.lower(),
+                "points": int(points),
+                "cost": {
+                    "diamond": int(diamond),
+                    "sapphire": int(sapphire),
+                    "emerald": int(emerald),
+                    "ruby": int(ruby),
+                    "onyx": int(onyx),
+                }
+            })()
+            cards.append(card)
+    return cards
+
 class UI:
     def __init__(self, screen, noble_cards, player1, player2):
         self.screen = screen
@@ -76,23 +100,17 @@ class UI:
 
         font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.03 * SHRINK_FACTOR))
 
-        # 👑 Move nobles to top of screen
         noble_y = int(SCREEN_HEIGHT * 0.02)
         noble_start_x = (GAME_AREA_WIDTH - ((NOBLE_CARD_SIZE + MARGIN_X) * 3 - MARGIN_X)) // 2 + PLAYER_PANEL_WIDTH
 
         for i, noble_card in enumerate(self.noble_cards):
             x = noble_start_x + i * (NOBLE_CARD_SIZE + MARGIN_X)
-
-            # Draw noble border
             border_rect = pygame.Rect(x - 3, noble_y - 3, NOBLE_CARD_SIZE + 6, NOBLE_CARD_SIZE + 6)
             pygame.draw.rect(self.screen, (0, 0, 0), border_rect, 2)
-
             if self.noble_image:
                 self.screen.blit(self.noble_image, (x, noble_y))
-
             points_text = font.render(str(getattr(noble_card, "points", 0)), True, (0, 0, 0))
             self.screen.blit(points_text, (x + 5, noble_y + 5))
-
             cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02 * SHRINK_FACTOR))
             noble_cost = getattr(noble_card, "cost", {})
             cost_y = noble_y + 30
@@ -102,7 +120,6 @@ class UI:
                 self.screen.blit(cost_text, (x + 5, cost_y))
                 cost_y += 20
 
-        # 📐 Center grid and give enough vertical space
         grid_start_y = noble_y + NOBLE_CARD_SIZE + int(SCREEN_HEIGHT * 0.04)
 
         for row in range(3, 0, -1):
@@ -111,7 +128,6 @@ class UI:
                 x = PLAYER_PANEL_WIDTH + (GAME_AREA_WIDTH - total_card_width) // 2 + col * (CARD_WIDTH + MARGIN_X)
                 y = grid_start_y + (3 - row) * (CARD_HEIGHT + MARGIN_Y)
 
-                # Draw development card border
                 border_rect = pygame.Rect(x - 3, y - 3, CARD_WIDTH + 6, CARD_HEIGHT + 6)
                 pygame.draw.rect(self.screen, (0, 0, 0), border_rect, 2)
 
@@ -125,7 +141,12 @@ class UI:
                 if card_img:
                     self.screen.blit(card_img, (x, y))
 
-                card_text = font.render(f"{card_color} ({card_points})", True, (0, 0, 0))
+                # Display bonus points in top-right corner if > 0
+                if card_points and int(card_points) > 0:
+                    point_text = font.render(str(card_points), True, (0, 0, 0))
+                    self.screen.blit(point_text, (x + CARD_WIDTH - 35, y + 10))
+
+                card_text = font.render(card_color.capitalize(), True, (0, 0, 0))
                 self.screen.blit(card_text, (x + 5, y + 5))
 
                 cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02 * SHRINK_FACTOR))
