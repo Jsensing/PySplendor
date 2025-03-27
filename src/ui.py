@@ -111,7 +111,7 @@ class UI:
                 self.screen.blit(self.noble_image, (x, noble_y))
             points_text = font.render(str(getattr(noble_card, "points", 0)), True, (0, 0, 0))
             self.screen.blit(points_text, (x + 5, noble_y + 5))
-            cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02 * SHRINK_FACTOR))
+            cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.025 * SHRINK_FACTOR))
             noble_cost = getattr(noble_card, "cost", {})
             cost_y = noble_y + 30
             for color, amount in noble_cost.items():
@@ -149,7 +149,7 @@ class UI:
                 card_text = font.render(card_color.capitalize(), True, (0, 0, 0))
                 self.screen.blit(card_text, (x + 5, y + 5))
 
-                cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.02 * SHRINK_FACTOR))
+                cost_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.03 * SHRINK_FACTOR))
                 cost_y = y + 35
                 for color, amount in card_cost.items():
                     text_color = COST_COLOR_MAP.get(color.lower(), (0, 0, 0))
