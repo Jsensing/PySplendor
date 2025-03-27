@@ -153,7 +153,7 @@ class UI:
                 cost_y = y + 35
                 for color, amount in card_cost.items():
                     text_color = COST_COLOR_MAP.get(color.lower(), (0, 0, 0))
-                    cost_text = cost_font.render(f"{color[0]}: {amount}", True, text_color)
+                    cost_text = cost_font.render(f"{color[0].upper()}: {amount}", True, text_color)
                     self.screen.blit(cost_text, (x + 5, cost_y))
                     cost_y += 20
 
