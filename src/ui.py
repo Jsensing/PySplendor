@@ -78,7 +78,7 @@ class UI:
 
         # Token stacks & selection state
         self.token_stacks = {
-            "diamond": 4,
+            "diamond": 6,
             "sapphire": 4,
             "emerald": 4,
             "ruby": 4,
@@ -138,26 +138,29 @@ class UI:
     def handle_token_click(self, pos, player):
         for rect, color in self.token_areas:
             if rect.collidepoint(pos):
-                available = self.token_stacks.get(color, 0)
-                selected = self.selected_tokens.get(color, 0)
-
                 if color == "gold":
                     return
 
-                if selected == 1:
-                    if available >= 4:
-                        self.token_stacks[color] -= 2
-                        player.tokens[color] = player.tokens.get(color, 0) + 2
-                        self.selected_tokens.clear()
+                available = self.token_stacks.get(color, 0)
+                selected = self.selected_tokens.get(color, 0)
+                total_selected_colors = len(self.selected_tokens)
+
+                # Disallow selecting if already took 2 from same color or 3 different
+                if total_selected_colors == 1 and list(self.selected_tokens.values())[0] == 2:
+                    return
+                if total_selected_colors == 3:
                     return
 
-                if len(self.selected_tokens) < self.selection_limit and available > 0:
-                    self.token_stacks[color] -= 1
-                    player.tokens[color] = player.tokens.get(color, 0) + 1
-                    self.selected_tokens[color] = 1
-                return
+                # Handle 2 from same color: can only do this if no other colors selected and enough in stack
+                if selected == 1:
+                    if total_selected_colors == 1 and available >= 4:
+                        self.token_stacks[color] -= 1
+                        player.tokens[color] = player.tokens.get(color, 0) + 1
+                        self.selected_tokens[color] = 2
+                    return
 
-                if len(self.selected_tokens) < self.selection_limit and available > 0:
+                # Handle 1 from a new color
+                if selected == 0 and available > 0:
                     self.token_stacks[color] -= 1
                     player.tokens[color] = player.tokens.get(color, 0) + 1
                     self.selected_tokens[color] = 1
