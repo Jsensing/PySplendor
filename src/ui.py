@@ -32,6 +32,7 @@ COST_COLOR_MAP = {
     "emerald": (0, 255, 0),
     "ruby": (255, 0, 0),
     "onyx": (0, 0, 0),
+    "gold": (218, 165, 32),
 }
 
 def load_scaled_image(path, size):
@@ -91,6 +92,31 @@ class UI:
             token_text = font.render(f"{color[0]}: {amount}", True, text_color)
             self.screen.blit(token_text, (x + 10, token_y))
             token_y += 25
+
+    def render_tokens(self):
+        token_radius = int(SCREEN_HEIGHT * 0.02)
+        spacing = token_radius * 3
+        start_x = (SCREEN_WIDTH - spacing * 6) // 2
+        y = SCREEN_HEIGHT - int(SCREEN_HEIGHT * 0.1)
+
+        font = pygame.font.Font(None, token_radius)
+
+        colors = ["diamond", "sapphire", "emerald", "ruby", "onyx"]
+        for i, color in enumerate(colors):
+            count = 4
+            cx = start_x + i * spacing
+            pygame.draw.circle(self.screen, COST_COLOR_MAP[color], (cx, y), token_radius, 3)
+            count_text = font.render(str(count), True, (0, 0, 0))
+            text_rect = count_text.get_rect(center=(cx, y))
+            self.screen.blit(count_text, text_rect)
+
+        # Draw 5 gold tokens
+        gold_count = 5
+        gold_x = start_x + len(colors) * spacing
+        pygame.draw.circle(self.screen, COST_COLOR_MAP["gold"], (gold_x, y), token_radius, 3)
+        gold_text = font.render(str(gold_count), True, (0, 0, 0))
+        gold_rect = gold_text.get_rect(center=(gold_x, y))
+        self.screen.blit(gold_text, gold_rect)
 
     def render_grid(self, grid):
         self.screen.fill((255, 255, 255))
@@ -156,6 +182,8 @@ class UI:
                     cost_text = cost_font.render(f"{color[0].upper()}: {amount}", True, text_color)
                     self.screen.blit(cost_text, (x + 5, cost_y))
                     cost_y += 20
+
+        self.render_tokens()
 
     def render_players(self):
         self.render_player_hand(self.player1, 10, 10)
