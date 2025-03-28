@@ -47,25 +47,26 @@ def load_scaled_image(path, size):
     return None
 
 def load_cards_from_csv(csv_path):
+    from src.card import DevelopmentCard
     cards = []
     with open(csv_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             if len(row) != 8:
-                continue  # skip malformed rows
+                continue
             tier, color, diamond, sapphire, emerald, ruby, onyx, points = row
-            card = type("Card", (object,), {
-                "tier": int(tier),
-                "color": color.lower(),
-                "points": int(points),
-                "cost": {
+            card = DevelopmentCard(
+                tier=int(tier),
+                color=color.lower(),
+                points=int(points),
+                cost={
                     "diamond": int(diamond),
                     "sapphire": int(sapphire),
                     "emerald": int(emerald),
                     "ruby": int(ruby),
                     "onyx": int(onyx),
                 }
-            })()
+            )
             cards.append(card)
     return cards
 
@@ -76,20 +77,9 @@ class UI:
         self.player1 = player1
         self.player2 = player2
 
-        # Token stacks & selection state
-        self.token_stacks = {
-            "diamond": 6,
-            "sapphire": 4,
-            "emerald": 4,
-            "ruby": 4,
-            "onyx": 4,
-            "gold": 5,
-        }
-        self.selected_tokens = {}
-        self.selection_limit = 3
+        self.token_stacks = {}  # Will be populated from external token manager
         self.token_areas = []
 
-        # Load shared noble image once
         self.noble_image = load_scaled_image("assets/nobleImg/noble.jpg", (NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
 
     def render_player_hand(self, player, x, y):
@@ -117,7 +107,7 @@ class UI:
 
         colors = ["diamond", "sapphire", "emerald", "ruby", "onyx"]
         for i, color in enumerate(colors):
-            count = self.token_stacks[color]
+            count = self.token_stacks.get(color, 0)
             cx = start_x + i * spacing
             pygame.draw.circle(self.screen, COST_COLOR_MAP[color], (cx, y), token_radius, 3)
             rect = pygame.Rect(cx - token_radius, y - token_radius, token_radius * 2, token_radius * 2)
@@ -126,7 +116,7 @@ class UI:
             text_rect = count_text.get_rect(center=(cx, y))
             self.screen.blit(count_text, text_rect)
 
-        gold_count = self.token_stacks["gold"]
+        gold_count = self.token_stacks.get("gold", 0)
         gold_x = start_x + len(colors) * spacing
         pygame.draw.circle(self.screen, COST_COLOR_MAP["gold"], (gold_x, y), token_radius, 3)
         rect = pygame.Rect(gold_x - token_radius, y - token_radius, token_radius * 2, token_radius * 2)
@@ -135,47 +125,12 @@ class UI:
         gold_rect = gold_text.get_rect(center=(gold_x, y))
         self.screen.blit(gold_text, gold_rect)
 
-    def handle_token_click(self, pos, player):
-        for rect, color in self.token_areas:
-            if rect.collidepoint(pos):
-                if color == "gold":
-                    return
-
-                available = self.token_stacks.get(color, 0)
-                selected = self.selected_tokens.get(color, 0)
-                total_selected_colors = len(self.selected_tokens)
-
-                # Disallow selecting if already took 2 from same color or 3 different
-                if total_selected_colors == 1 and list(self.selected_tokens.values())[0] == 2:
-                    return
-                if total_selected_colors == 3:
-                    return
-
-                # Handle 2 from same color: can only do this if no other colors selected and enough in stack
-                if selected == 1:
-                    if total_selected_colors == 1 and available >= 4:
-                        self.token_stacks[color] -= 1
-                        player.tokens[color] = player.tokens.get(color, 0) + 1
-                        self.selected_tokens[color] = 2
-                    return
-
-                # Handle 1 from a new color
-                if selected == 0 and available > 0:
-                    self.token_stacks[color] -= 1
-                    player.tokens[color] = player.tokens.get(color, 0) + 1
-                    self.selected_tokens[color] = 1
-                return
-
-    def end_turn(self):
-        self.selected_tokens.clear()
-
     def render_grid(self, grid):
         self.screen.fill((255, 255, 255))
         self.render_player_hand(self.player1, 10, 10)
         self.render_player_hand(self.player2, SCREEN_WIDTH - PLAYER_PANEL_WIDTH - 10, 10)
 
         font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.03 * SHRINK_FACTOR))
-
         noble_y = int(SCREEN_HEIGHT * 0.02)
         noble_start_x = (GAME_AREA_WIDTH - ((NOBLE_CARD_SIZE + MARGIN_X) * 3 - MARGIN_X)) // 2 + PLAYER_PANEL_WIDTH
 
