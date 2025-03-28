@@ -47,7 +47,6 @@ def load_scaled_image(path, size):
     return None
 
 def load_cards_from_csv(csv_path):
-    from src.card import DevelopmentCard
     cards = []
     with open(csv_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
@@ -55,18 +54,18 @@ def load_cards_from_csv(csv_path):
             if len(row) != 8:
                 continue
             tier, color, diamond, sapphire, emerald, ruby, onyx, points = row
-            card = DevelopmentCard(
-                tier=int(tier),
-                color=color.lower(),
-                points=int(points),
-                cost={
+            card = type("DevelopmentCard", (object,), {
+                "tier": int(tier),
+                "color": color.lower(),
+                "points": int(points),
+                "cost": {
                     "diamond": int(diamond),
                     "sapphire": int(sapphire),
                     "emerald": int(emerald),
                     "ruby": int(ruby),
                     "onyx": int(onyx),
                 }
-            )
+            })()
             cards.append(card)
     return cards
 
@@ -90,10 +89,12 @@ class UI:
         self.screen.blit(points_text, (x + 10, y + 40))
 
         token_y = y + 80
-        for color, amount in player.tokens.items():
+        token_x = x + 10
+        for color in ["diamond", "sapphire", "emerald", "ruby", "onyx", "gold"]:
+            amount = player.tokens.get(color, 0)
             text_color = COST_COLOR_MAP.get(color.lower(), (0, 0, 0))
-            token_text = font.render(f"{color[0]}: {amount}", True, text_color)
-            self.screen.blit(token_text, (x + 10, token_y))
+            token_text = font.render(f"{color.capitalize()}: {amount}", True, text_color)
+            self.screen.blit(token_text, (token_x, token_y))
             token_y += 25
 
     def render_tokens(self):
