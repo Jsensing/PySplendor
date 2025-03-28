@@ -76,6 +76,19 @@ class UI:
         self.player1 = player1
         self.player2 = player2
 
+        # Token stacks & selection state
+        self.token_stacks = {
+            "diamond": 4,
+            "sapphire": 4,
+            "emerald": 4,
+            "ruby": 4,
+            "onyx": 4,
+            "gold": 5,
+        }
+        self.selected_tokens = {}
+        self.selection_limit = 3
+        self.token_areas = []
+
         # Load shared noble image once
         self.noble_image = load_scaled_image("assets/nobleImg/noble.jpg", (NOBLE_CARD_SIZE, NOBLE_CARD_SIZE))
 
@@ -100,27 +113,61 @@ class UI:
         y = SCREEN_HEIGHT - int(SCREEN_HEIGHT * 0.06)
 
         font = pygame.font.Font(None, token_radius)
+        self.token_areas.clear()
 
         colors = ["diamond", "sapphire", "emerald", "ruby", "onyx"]
         for i, color in enumerate(colors):
-            count = 4
+            count = self.token_stacks[color]
             cx = start_x + i * spacing
             pygame.draw.circle(self.screen, COST_COLOR_MAP[color], (cx, y), token_radius, 3)
+            rect = pygame.Rect(cx - token_radius, y - token_radius, token_radius * 2, token_radius * 2)
+            self.token_areas.append((rect, color))
             count_text = font.render(str(count), True, (0, 0, 0))
             text_rect = count_text.get_rect(center=(cx, y))
             self.screen.blit(count_text, text_rect)
 
-        # Draw 5 gold tokens
-        gold_count = 5
+        gold_count = self.token_stacks["gold"]
         gold_x = start_x + len(colors) * spacing
         pygame.draw.circle(self.screen, COST_COLOR_MAP["gold"], (gold_x, y), token_radius, 3)
+        rect = pygame.Rect(gold_x - token_radius, y - token_radius, token_radius * 2, token_radius * 2)
+        self.token_areas.append((rect, "gold"))
         gold_text = font.render(str(gold_count), True, (0, 0, 0))
         gold_rect = gold_text.get_rect(center=(gold_x, y))
         self.screen.blit(gold_text, gold_rect)
 
+    def handle_token_click(self, pos, player):
+        for rect, color in self.token_areas:
+            if rect.collidepoint(pos):
+                available = self.token_stacks.get(color, 0)
+                selected = self.selected_tokens.get(color, 0)
+
+                if color == "gold":
+                    return
+
+                if selected == 1:
+                    if available >= 4:
+                        self.token_stacks[color] -= 2
+                        player.tokens[color] = player.tokens.get(color, 0) + 2
+                        self.selected_tokens.clear()
+                    return
+
+                if len(self.selected_tokens) < self.selection_limit and available > 0:
+                    self.token_stacks[color] -= 1
+                    player.tokens[color] = player.tokens.get(color, 0) + 1
+                    self.selected_tokens[color] = 1
+                return
+
+                if len(self.selected_tokens) < self.selection_limit and available > 0:
+                    self.token_stacks[color] -= 1
+                    player.tokens[color] = player.tokens.get(color, 0) + 1
+                    self.selected_tokens[color] = 1
+                return
+
+    def end_turn(self):
+        self.selected_tokens.clear()
+
     def render_grid(self, grid):
         self.screen.fill((255, 255, 255))
-
         self.render_player_hand(self.player1, 10, 10)
         self.render_player_hand(self.player2, SCREEN_WIDTH - PLAYER_PANEL_WIDTH - 10, 10)
 
@@ -167,7 +214,6 @@ class UI:
                 if card_img:
                     self.screen.blit(card_img, (x, y))
 
-                # Display bonus points in top-right corner if > 0
                 if card_points and int(card_points) > 0:
                     point_text = font.render(str(card_points), True, (0, 0, 0))
                     self.screen.blit(point_text, (x + CARD_WIDTH - 35, y + 10))
