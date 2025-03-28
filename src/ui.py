@@ -94,10 +94,10 @@ class UI:
             token_y += 25
 
     def render_tokens(self):
-        token_radius = int(SCREEN_HEIGHT * 0.02)
+        token_radius = int(SCREEN_HEIGHT * 0.035)
         spacing = token_radius * 3
         start_x = (SCREEN_WIDTH - spacing * 6) // 2
-        y = SCREEN_HEIGHT - int(SCREEN_HEIGHT * 0.1)
+        y = SCREEN_HEIGHT - int(SCREEN_HEIGHT * 0.06)
 
         font = pygame.font.Font(None, token_radius)
 
